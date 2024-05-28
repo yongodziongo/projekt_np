@@ -1,0 +1,57 @@
+services:
+
+#system kontroli wersji
+  server:
+    image: gitea/gitea
+    container_name: gitea
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    restart: always
+    volumes:
+      - ./gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3000:3000"
+      - "222:22"
+    
+
+#testy jednostkowe
+  jenkins: #do dalszej konfiguracji i integracji z gitem
+    image: jenkins/jenkins:lts
+    ports:
+      - 8080:8080
+      - 50000:50000
+    volumes:
+      - ./jenkins_home:/var/jenkins_home
+    environment:
+      - JENKINS_USER=admin_ci
+      - JENKINS_PASS=P@s$c1
+    container_name: jenkins
+    #jeszcze jenkinsfile trzeba stworzyć
+
+  #dane do logowania
+    #admin
+    #0e764a5c060449b09ca449e289c86808
+
+#serwer http
+  nginx: #do dalszej konfiguracji
+    image: nginx:1.16.0-alpine
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.condf:/etc/nginx/nginx.conf:ro
+      - ./html:/usr/share/nginx/html
+    environment:
+      - SVN_USER=admin_svn
+      - SVN_PASSWORD=P@s$g1t
+    container_name: nginx
+
+
+
+#gitea
+#czasami to nie wystarczy i trzeba plik konfiguracyjny
+#a do tego tworzysz volume
+
+#Robisz w dockerze(na ubuntu) service i nazywasz go jakkolwiek
